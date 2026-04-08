@@ -5,19 +5,17 @@
  */
 package ur_os.system;
 
-import ur_os.process.ProcessInstructionType;
-import ur_os.memory.contiguous.SMM_Contiguous;
-import ur_os.memory.Memory;
-import ur_os.memory.MemoryManagerType;
-import ur_os.process.Process;
 import java.util.ArrayList;
 import java.util.Random;
+import ur_os.memory.Memory;
 import ur_os.memory.MemoryInstruction;
+import ur_os.memory.MemoryManagerType;
 import ur_os.memory.MemoryOperationType;
 import ur_os.memory.freememorymagament.FreeMemorySlotManager;
 import ur_os.process.EndInstruction;
 import ur_os.process.IOInstruction;
 import ur_os.process.Instruction;
+import ur_os.process.Process;
 import ur_os.virtualmemory.SwapMemory;
 
 /**
@@ -44,7 +42,7 @@ public class SystemOS implements Runnable{
     public static final int SEED_SEGMENTS = 7401;
     public static final int SEED_PROCESS_SIZE = 9630;
     
-    public static final int MEMORY_SIZE = 1_048_576; //1MB
+    public static final int MEMORY_SIZE = 2840; //1MB
     public static final int SWAP_MEMORY_SIZE = 1_073_741_824; //1 GB
     
     protected ArrayList<Process> processes;
@@ -62,8 +60,8 @@ public class SystemOS implements Runnable{
         processes = new ArrayList();
         //initSimulationQueue();
         //initSimulationQueueSimple();
-        initSimulationQueueSimpler();
-        
+        //initSimulationQueueSimpler();
+        initBestFitScenario();
 
         showProcesses();
         this.simType = simType;
@@ -277,7 +275,37 @@ public class SystemOS implements Runnable{
         clock = 0;
     }
     
-    
+
+    public void initBestFitScenario() {
+        Process p;
+        Instruction temp;
+
+        // Proceso 0
+        p = new Process(0, 0);
+        p.setSize(300);
+        p.addCPUInstructions(15);
+        temp = new EndInstruction();        
+        p.addInstruction(temp);
+        processes.add(p);
+
+        // Proceso 1
+        p = new Process(1, 5);
+        p.setSize(700);
+        p.addCPUInstructions(10);
+        temp = new EndInstruction();        
+        p.addInstruction(temp);
+        processes.add(p);
+
+        // Proceso 2
+        p = new Process(2, 16);
+        p.setSize(200);
+        p.addCPUInstructions(8);
+        temp = new EndInstruction();       
+        p.addInstruction(temp);
+        processes.add(p);
+
+        clock = 0;
+    }
     
     public boolean isSimulationFinished(){
         

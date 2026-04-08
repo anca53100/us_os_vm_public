@@ -5,9 +5,9 @@
  */
 package ur_os.process;
 
+import java.util.Random;
 import ur_os.memory.ProcessMemoryManager;
 import ur_os.memory.contiguous.PMM_Contiguous;
-import java.util.Random;
 import ur_os.system.OS;
 
 /**
@@ -244,6 +244,10 @@ public class Process implements Comparable{
 
     public int getPriority() {
         return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
     
     

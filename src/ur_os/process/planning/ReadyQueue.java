@@ -5,7 +5,6 @@
  */
 package ur_os.process.planning;
 
-import java.util.ArrayList;
 import ur_os.process.Process;
 import ur_os.system.OS;
 
@@ -56,7 +55,5 @@ public class ReadyQueue {
         
         return s.toString();
     }
-    
-   
     
 }

@@ -5,6 +5,7 @@
 package ur_os.process.planning;
 
 import ur_os.process.Process;
+import ur_os.process.ProcessState;
 import ur_os.system.InterruptType;
 import ur_os.system.OS;
 
@@ -43,9 +44,39 @@ public class RoundRobin extends Scheduler{
    
     @Override
     public void getNext(boolean cpuEmpty) {
-        //ToDo
-        
+        if (cpuEmpty) {
+            if (!processes.isEmpty()) {
+                Process p = processes.remove(0);
+                p.setState(ProcessState.CPU); // o RUNNING según tu enum
+                os.interrupt(InterruptType.SCHEDULER_RQ_TO_CPU, p);
+                resetCounter();
+            }
+            return;
+        }
+
+        // 2) CPU ocupada -> avanzamos contador de quantum
+        cont++;
+
+        // 3) Sólo preemptar si el quantum venció Y hay otro proceso esperando
+        if (cont >= q && !processes.isEmpty()) {
+            Process current = os.getProcessInCPU();
+            if (current != null) {
+                // Informamos al OS que el proceso en CPU debe volver a la cola de listos
+                os.interrupt(InterruptType.SCHEDULER_CPU_TO_RQ, current);
+                // NOTA: NO añadir 'current' a `processes` aquí si el OS ya lo reencola.
+                // Si tu OS NO reencola al recibir el interrupt, entonces descomenta la línea siguiente:
+                // processes.add(current);
+            }
+
+            // Despachamos el siguiente en la cola
+            Process next = processes.remove(0);
+            next.setState(ProcessState.CPU);
+            os.interrupt(InterruptType.SCHEDULER_RQ_TO_CPU, next);
+
+            resetCounter();
+        }
     }
+    
     
     
     @Override

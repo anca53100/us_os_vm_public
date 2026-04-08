@@ -22,9 +22,28 @@ public class SJF_NP extends Scheduler{
    
     @Override
     public void getNext(boolean cpuEmpty) {
-       //ToDo
+       if (cpuEmpty && !processes.isEmpty()) {
+            // Buscar directamente el proceso con menor ráfaga usando un recorrido
+            Process shortest = null;
+            for (Process p : processes) {
+                if (shortest == null) {
+                    shortest = p;
+                } else if (p.getRemainingTimeInCurrentBurst() < shortest.getRemainingTimeInCurrentBurst()) {
+                    shortest = p;
+                } else if (p.getRemainingTimeInCurrentBurst() == shortest.getRemainingTimeInCurrentBurst()) {
+                    shortest = tieBreaker(shortest, p); // desempate
+                }
+            }
+
+            // Si encontramos uno, lo quitamos y lo mandamos a CPU
+            if (shortest != null) {
+                processes.remove(shortest);
+                os.interrupt(InterruptType.SCHEDULER_RQ_TO_CPU, shortest);
+            }
+        }
         
     }
+    
     
     @Override
     public void newProcess(boolean cpuEmpty) {} //Non-preemtive

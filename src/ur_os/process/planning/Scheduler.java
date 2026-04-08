@@ -4,7 +4,6 @@
  */
 package ur_os.process.planning;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import ur_os.process.Process;
 import ur_os.process.ProcessState;
@@ -41,6 +40,77 @@ public abstract class Scheduler {
     public void returnProcess(Process p){
         processes.addFirst(p);
     }
+    
+    public Process tieBreaker(Process p1, Process p2){
+        Process p = null;
+        switch(os.SCHEDULER_TIEBREAKER_TYPE){
+        
+            case LARGEST_PID:
+                if(p1.getPid() > p2.getPid()){
+                    p = p1;
+                }else{
+                    p = p2;
+                }
+            break;
+            
+            case SMALLEST_PID:
+                if(p1.getPid() < p2.getPid()){
+                    p = p1;
+                }else{
+                    p = p2;
+                }
+            break;
+            
+            case PRIORITY:
+                if(p1.getPriority() < p2.getPriority()){
+                    p = p1;
+                }else{
+                    p = p2;
+                }
+            break;
+            
+            case PRIORITY_LARGEST_PID:
+                if(p1.getPriority() < p2.getPriority()){
+                    p = p1;
+                }else if(p1.getPriority() > p2.getPriority()){
+                    p = p2;
+                }else{
+                    if(p1.getPid() > p2.getPid()){
+                        p = p1;
+                    }else{
+                        p = p2;
+                    }
+                }
+            break;
+            
+            case PRIORITY_SMALLEST_PID:
+                if(p1.getPriority() < p2.getPriority()){
+                    p = p1;
+                }else if(p1.getPriority() > p2.getPriority()){
+                    p = p2;
+                }else{
+                    if(p1.getPid() < p2.getPid()){
+                        p = p1;
+                    }else{
+                        p = p2;
+                    }
+                }
+            break;
+            
+            default:
+                if(p1.getPid() > p2.getPid()){
+                    p = p1;
+                }else{
+                    p = p2;
+                }
+            break;
+            
+        
+        }
+        
+        return p;
+    }
+    
     
     public void addProcess(Process p){
         
