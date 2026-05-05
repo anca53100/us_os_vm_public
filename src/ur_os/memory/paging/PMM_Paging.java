@@ -101,27 +101,23 @@ public class PMM_Paging extends ProcessMemoryManager{
     }
     
     public MemoryAddress getPageMemoryAddressFromLocalAddress(int locAdd){
-        
-        //Include your code here
-        
-        
-        return new MemoryAddress(-1, -1);
+        int page = locAdd / OS.PAGE_SIZE;
+        int offset = locAdd % OS.PAGE_SIZE;
+        return new MemoryAddress(page, offset);
     }
     
     public int getFrameMemoryAddressFromLogicalMemoryAddress(int page){
-        
-        //Include your code here
-        
-        return -1;
+        return pt.getFrameIdFromPage(page);
     }
     
     public MemoryAddress getFrameMemoryAddressFromLogicalMemoryAddress(MemoryAddress m){
-        
-        //Include your code here
-        //Return null if the address is not loaded in a frame (just for virtual memory)
-        //Include a memory access to the page that is being accessed and that is loaded
-        
-        return new MemoryAddress(-1, -1);
+        int page = m.getDivision();
+        int frameId = pt.getFrameIdFromPage(page);
+        if (frameId < 0) return null; // page not loaded (page fault)
+        addMemoryAccess(page);
+        // division=page so getDivision() returns page number (used for dirty tracking);
+        // offset arranged so that getAddress() = frameId*PAGE_SIZE + byteOffset (physical address)
+        return new MemoryAddress(page, frameId * OS.PAGE_SIZE + m.getOffset() - page);
     }
     
     
@@ -130,10 +126,11 @@ public class PMM_Paging extends ProcessMemoryManager{
     }
     
     public MemoryAddress getVFrameMemoryAddressFromLogicalMemoryAddress(MemoryAddress m){
-        
-        //Include your code here
-        
-        return new MemoryAddress(-1, -1);
+        int page = m.getDivision();
+        int vframeId = vpt.getFrameIdFromPage(page);
+        if (vframeId < 0) return null;
+        // division=vframeId so getDivision() returns the virtual frame (swap location)
+        return new MemoryAddress(vframeId, m.getOffset());
     }
     
    
